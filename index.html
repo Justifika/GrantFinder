@@ -1,197 +1,505 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta charset="utf-8">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>GrantFinder — Encuentra tu subvención</title>
+  <meta name="description" content="Encuentra subvenciones públicas en España adaptadas a tu perfil">
+  <meta name="theme-color" content="#0D2B4E">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { background: #0D2B4E; display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: -apple-system, BlinkMacSystemFont, sans-serif; }
-    #__bundler_loading { position: fixed; bottom: 20px; right: 20px; font: 13px/1.4 -apple-system, BlinkMacSystemFont, sans-serif; color: #666; background: #fff; padding: 8px 14px; border-radius: 8px; }
-    #__bundler_thumbnail { position: fixed; inset: 0; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: #0D2B4E; z-index: 9999; }
-    #__bundler_thumbnail svg { width: 100%; height: 100%; object-fit: contain; }
-    #__bundler_placeholder { color: #999; font-size: 14px; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0D2B4E 0%, #1A4A7A 100%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      max-width: 1200px;
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+    }
+
+    .sidebar {
+      background: rgba(26, 74, 122, 0.4);
+      border-radius: 16px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      height: fit-content;
+    }
+
+    .sidebar h2 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #b4976e;
+    }
+
+    .sidebar p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-bottom: 24px;
+    }
+
+    .filter-group {
+      margin-bottom: 24px;
+    }
+
+    .filter-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: 8px;
+      letter-spacing: 0.5px;
+    }
+
+    .filter-input,
+    .filter-select {
+      width: 100%;
+      padding: 10px 14px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      color: #ffffff;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.3s ease;
+    }
+
+    .filter-input:focus,
+    .filter-select:focus {
+      outline: none;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: #b4976e;
+      box-shadow: 0 0 0 2px rgba(180, 151, 110, 0.2);
+    }
+
+    .filter-select option {
+      background: #0D2B4E;
+      color: #ffffff;
+    }
+
+    .main-content {
+      background: rgba(26, 74, 122, 0.3);
+      border-radius: 16px;
+      padding: 40px;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .header {
+      margin-bottom: 40px;
+    }
+
+    .header h1 {
+      font-size: 42px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      letter-spacing: -0.5px;
+    }
+
+    .header h1 .accent {
+      color: #b4976e;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .action-buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 768px) {
+      .action-buttons {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .btn {
+      padding: 12px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-align: center;
+      font-family: inherit;
+    }
+
+    .btn-primary {
+      background: #b4976e;
+      color: #0D2B4E;
+    }
+
+    .btn-primary:hover {
+      background: #d4b896;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(180, 151, 110, 0.3);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      color: #ffffff;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .results {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .result-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .result-item:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: #b4976e;
+      transform: translateX(4px);
+    }
+
+    .result-title {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #b4976e;
+    }
+
+    .result-desc {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .result-meta {
+      display: flex;
+      gap: 16px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-top-color: #b4976e;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.5);
+    }
   </style>
-  <noscript>
-    <style>#__bundler_loading { display: none; }</style>
-    <div style="position:fixed;bottom:12px;left:12px;font:13px/1.4 -apple-system,BlinkMacSystemFont,sans-serif;color:#999;background:rgba(255,255,255,0.9);padding:6px 12px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.1)">
-      This page requires JavaScript to display.
-    </div>
-  </noscript>
 </head>
 <body>
-  <div id="__bundler_thumbnail">
-  <svg viewBox="0 0 800 500" xmlns="http://www.w3.org/2000/svg">
-    <rect width="800" height="500" fill="#0D2B4E"></rect>
-    <rect x="60" y="60" width="280" height="380" rx="16" fill="#1A4A7A" opacity="0.6"></rect>
-    <rect x="80" y="90" width="240" height="12" rx="6" fill="#b4976e" opacity="0.9"></rect>
-    <rect x="80" y="114" width="180" height="8" rx="4" fill="white" opacity="0.3"></rect>
-    <rect x="80" y="148" width="240" height="56" rx="10" fill="white" opacity="0.08"></rect>
-    <rect x="80" y="218" width="240" height="56" rx="10" fill="white" opacity="0.08"></rect>
-    <rect x="80" y="288" width="240" height="56" rx="10" fill="white" opacity="0.08"></rect>
-    <rect x="80" y="358" width="240" height="56" rx="10" fill="white" opacity="0.08"></rect>
-    <rect x="380" y="60" width="360" height="380" rx="16" fill="#1A4A7A" opacity="0.4"></rect>
-    <rect x="400" y="88" width="200" height="16" rx="8" fill="white" opacity="0.7"></rect>
-    <rect x="400" y="116" width="140" height="8" rx="4" fill="#b4976e" opacity="0.7"></rect>
-    <rect x="400" y="148" width="320" height="6" rx="3" fill="white" opacity="0.2"></rect>
-    <rect x="400" y="164" width="280" height="6" rx="3" fill="white" opacity="0.2"></rect>
-    <rect x="400" y="180" width="300" height="6" rx="3" fill="white" opacity="0.2"></rect>
-    <rect x="400" y="220" width="140" height="40" rx="8" fill="#b4976e" opacity="0.5"></rect>
-    <rect x="556" y="220" width="140" height="40" rx="8" fill="white" opacity="0.1"></rect>
-    <text x="400" y="348" font-family="sans-serif" font-size="28" font-weight="700" fill="white">Grant<tspan fill="#b4976e">Finder</tspan></text>
-    <text x="400" y="374" font-family="sans-serif" font-size="13" fill="rgba(255,255,255,0.5)">Subvenciones públicas · España</text>
-    <circle cx="720" cy="420" r="36" fill="#b4976e" opacity="0.9"></circle>
-    <rect x="708" y="409" width="24" height="16" rx="4" fill="white" opacity="0.9"></rect>
-    <rect x="712" y="427" width="16" height="2" rx="1" fill="#b4976e"></rect>
-  </svg>
-</div>
-  <div id="__bundler_loading">Unpacking...</div>
+  <div class="container">
+    <!-- Sidebar Filters -->
+    <div class="sidebar">
+      <h2>Filtros</h2>
+      <p>Refina tu búsqueda de subvenciones</p>
+
+      <div class="filter-group">
+        <label class="filter-label">Tipo de solicitante</label>
+        <select class="filter-select" id="filterType">
+          <option value="">Todos</option>
+          <option value="pyme">PYME</option>
+          <option value="startup">Startup</option>
+          <option value="autonomo">Autónomo</option>
+          <option value="empresa">Empresa</option>
+          <option value="ong">ONG</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Sector</label>
+        <select class="filter-select" id="filterSector">
+          <option value="">Todos</option>
+          <option value="tecnologia">Tecnología</option>
+          <option value="energia">Energía</option>
+          <option value="agricultura">Agricultura</option>
+          <option value="turismo">Turismo</option>
+          <option value="cultura">Cultura</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Región</label>
+        <select class="filter-select" id="filterRegion">
+          <option value="">Todas</option>
+          <option value="madrid">Madrid</option>
+          <option value="barcelona">Barcelona</option>
+          <option value="valencia">Valencia</option>
+          <option value="bilbao">Bilbao</option>
+          <option value="sevilla">Sevilla</option>
+        </select>
+      </div>
+
+      <div class="filter-group">
+        <label class="filter-label">Importe mínimo (€)</label>
+        <input type="number" class="filter-input" id="filterAmount" placeholder="Ej: 50000" min="0">
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="header">
+        <h1>Grant<span class="accent">Finder</span></h1>
+        <p>Subvenciones públicas · España</p>
+      </div>
+
+      <div class="action-buttons">
+        <button class="btn btn-primary" id="searchBtn">🔍 Buscar subvenciones</button>
+        <button class="btn btn-secondary" id="resetBtn">↻ Limpiar filtros</button>
+      </div>
+
+      <div class="results" id="results">
+        <div class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <p>Usa los filtros y haz clic en "Buscar subvenciones" para empezar</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>Información actualizada según datos públicos de organismos de financiación</p>
+      </div>
+    </div>
+  </div>
 
   <script>
-    
-document.addEventListener('DOMContentLoaded', async function() {
-  const loading = document.getElementById('__bundler_loading');
-  function setStatus(msg) { if (loading) loading.textContent = msg; }
-
-  // Error sink persists across replaceWith since it's on window, not the DOM.
-  window.addEventListener('error', function(e) {
-    var p = document.body || document.documentElement;
-    var d = document.getElementById('__bundler_err') || p.appendChild(document.createElement('div'));
-    d.id = '__bundler_err';
-    d.style.cssText = 'position:fixed;bottom:12px;left:12px;right:12px;font:12px/1.4 ui-monospace,monospace;background:#2a1215;color:#ff8a80;padding:10px 14px;border-radius:8px;border:1px solid #5c2b2d;z-index:9999';
-    d.textContent = (d.textContent ? d.textContent + String.fromCharCode(10) : '') +
-      '[bundle] ' + (e.message || e.type) +
-      (e.filename ? ' (' + e.filename.slice(0, 60) + ':' + e.lineno + ')' : '');
-  }, true);
-
-  try {
-    const manifestEl = document.querySelector('script[type="__bundler/manifest"]');
-    const templateEl = document.querySelector('script[type="__bundler/template"]');
-    if (!manifestEl || !templateEl) {
-      setStatus('Error: missing bundle data');
-      console.error('[bundler] Missing script tags — manifestEl:', !!manifestEl, 'templateEl:', !!templateEl);
-      return;
-    }
-
-    const manifest = JSON.parse(manifestEl.textContent);
-    let template = JSON.parse(templateEl.textContent);
-
-    const uuids = Object.keys(manifest);
-    setStatus('Unpacking ' + uuids.length + ' assets...');
-
-    const blobUrls = {};
-    await Promise.all(uuids.map(async (uuid) => {
-      const entry = manifest[uuid];
-      try {
-        const binaryStr = atob(entry.data);
-        const bytes = new Uint8Array(binaryStr.length);
-        for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
-
-        let finalBytes = bytes;
-        if (entry.compressed) {
-          if (typeof DecompressionStream !== 'undefined') {
-            const ds = new DecompressionStream('gzip');
-            const writer = ds.writable.getWriter();
-            const reader = ds.readable.getReader();
-            writer.write(bytes);
-            writer.close();
-            const chunks = [];
-            let totalLen = 0;
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              chunks.push(value);
-              totalLen += value.length;
-            }
-            finalBytes = new Uint8Array(totalLen);
-            let offset = 0;
-            for (const chunk of chunks) { finalBytes.set(chunk, offset); offset += chunk.length; }
-          } else {
-            console.warn('DecompressionStream not available, asset ' + uuid + ' may not render');
-          }
-        }
-
-        blobUrls[uuid] = URL.createObjectURL(new Blob([finalBytes], { type: entry.mime }));
-      } catch (err) {
-        console.error('Failed to decode asset ' + uuid + ':', err);
-        blobUrls[uuid] = URL.createObjectURL(new Blob([], { type: entry.mime }));
+    // Mock data de subvenciones
+    const grants = [
+      {
+        id: 1,
+        title: "Subvención para Transformación Digital de PYMES",
+        description: "Financiación de hasta el 80% para proyectos de digitalización en pequeñas y medianas empresas.",
+        type: "pyme",
+        sector: "tecnologia",
+        region: "madrid",
+        amount: 150000,
+        deadline: "2026-06-30"
+      },
+      {
+        id: 2,
+        title: "Fondo de Innovación Tecnológica para Startups",
+        description: "Apoyo a startups innovadoras en sectores estratégicos con dotación de hasta €100.000.",
+        type: "startup",
+        sector: "tecnologia",
+        region: "barcelona",
+        amount: 100000,
+        deadline: "2026-07-15"
+      },
+      {
+        id: 3,
+        title: "Programa de Energías Renovables",
+        description: "Subvención para instalación de paneles solares y sistemas de energía renovable.",
+        type: "empresa",
+        sector: "energia",
+        region: "valencia",
+        amount: 200000,
+        deadline: "2026-08-30"
+      },
+      {
+        id: 4,
+        title: "Línea de crédito para Autónomos",
+        description: "Financiación blanda para autónomos que creen o desarrollen su negocio.",
+        type: "autonomo",
+        sector: "tecnologia",
+        region: "bilbao",
+        amount: 50000,
+        deadline: "2026-09-15"
+      },
+      {
+        id: 5,
+        title: "Fondo de Cultura y Patrimonio",
+        description: "Apoyo a proyectos culturales, artísticos y de conservación del patrimonio histórico.",
+        type: "ong",
+        sector: "cultura",
+        region: "sevilla",
+        amount: 75000,
+        deadline: "2026-10-01"
+      },
+      {
+        id: 6,
+        title: "Subvención para Turismo Sostenible",
+        description: "Financiación para proyectos de turismo responsable y sostenible.",
+        type: "pyme",
+        sector: "turismo",
+        region: "madrid",
+        amount: 120000,
+        deadline: "2026-08-15"
       }
-    }));
+    ];
 
-    const extResEl = document.querySelector('script[type="__bundler/ext_resources"]');
-    const extResources = extResEl ? JSON.parse(extResEl.textContent) : [];
-    const resourceMap = {};
-    for (const entry of extResources) {
-      if (blobUrls[entry.uuid]) resourceMap[entry.id] = blobUrls[entry.uuid];
+    const searchBtn = document.getElementById('searchBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const filterType = document.getElementById('filterType');
+    const filterSector = document.getElementById('filterSector');
+    const filterRegion = document.getElementById('filterRegion');
+    const filterAmount = document.getElementById('filterAmount');
+    const resultsDiv = document.getElementById('results');
+
+    function formatCurrency(amount) {
+      return new Intl.NumberFormat('es-ES', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 0
+      }).format(amount);
     }
 
-    setStatus('Rendering...');
-    for (const uuid of uuids) template = template.split(uuid).join(blobUrls[uuid]);
-
-    // Strip integrity + crossorigin — blob URLs from a file:// document inherit
-    // a null origin, so crossorigin forces a CORS fetch that SRI then rejects.
-    // The manifest bytes are ours; SRI protects against CDN compromise, not this.
-    template = template.replace(/\s+integrity="[^"]*"/gi, '').replace(/\s+crossorigin="[^"]*"/gi, '');
-
-    const resourceScript = '<script>window.__resources = ' +
-      JSON.stringify(resourceMap).split('</' + 'script>').join('<\\/' + 'script>') +
-      ';</' + 'script>';
-    // Inject after <head> so the DOCTYPE stays first; prepending the script
-    // would push the parser into quirks mode. DOMParser always emits a <head>
-    // (synthesizing one if the source HTML omitted it) but may carry
-    // attributes through, so match the full opening tag. slice() rather than
-    // replace() keeps us clear of $-pattern substitution in resourceScript.
-    const headOpen = template.match(/<head[^>]*>/i);
-    if (headOpen) {
-      const i = headOpen.index + headOpen[0].length;
-      template = template.slice(0, i) + resourceScript + template.slice(i);
+    function formatDate(dateStr) {
+      return new Date(dateStr).toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
     }
 
-    // Parse the template and swap the root element. Scripts inserted via
-    // DOMParser/replaceWith are inert per spec — re-create each with
-    // createElement so they execute, awaiting onload for src scripts to
-    // preserve ordering (React before ReactDOM before Babel before text/babel).
-    const doc = new DOMParser().parseFromString(template, 'text/html');
-    document.documentElement.replaceWith(doc.documentElement);
-    const dead = Array.from(document.scripts);
-    for (const old of dead) {
-      const s = document.createElement('script');
-      for (const a of old.attributes) s.setAttribute(a.name, a.value);
-      s.textContent = old.textContent;
-      // text/babel scripts with a src: fetch and inline. transformScriptTags
-      // does XHR against the src, but blob:null/ from a file:// origin is
-      // silently dropped. Inlining makes it a plain inline babel script,
-      // which transformScriptTags handles unconditionally.
-      if ((s.type === 'text/babel' || s.type === 'text/jsx') && s.src) {
-        const r = await fetch(s.src);
-        s.textContent = await r.text();
-        s.removeAttribute('src');
+    function renderResults(filteredGrants) {
+      if (filteredGrants.length === 0) {
+        resultsDiv.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <p>No se encontraron subvenciones con estos criterios. Intenta ajustar los filtros.</p>
+          </div>
+        `;
+        return;
       }
-      const p = s.src ? new Promise(function(r) { s.onload = s.onerror = r; }) : null;
-      old.replaceWith(s);
-      if (p) await p;
+
+      resultsDiv.innerHTML = `
+        <div style="margin-bottom: 16px; font-size: 13px; color: rgba(255, 255, 255, 0.6);">
+          Se encontraron <strong style="color: #b4976e;">${filteredGrants.length}</strong> subvención${filteredGrants.length !== 1 ? 'es' : ''}
+        </div>
+        ${filteredGrants.map(grant => `
+          <div class="result-item">
+            <div class="result-title">${grant.title}</div>
+            <div class="result-desc">${grant.description}</div>
+            <div class="result-meta">
+              <span>💰 ${formatCurrency(grant.amount)}</span>
+              <span>📅 Cierra: ${formatDate(grant.deadline)}</span>
+            </div>
+          </div>
+        `).join('')}
+      `;
     }
-    // Babel standalone auto-transforms type=text/babel on DOMContentLoaded,
-    // which fired before we swapped the document. Trigger manually if present.
-    if (window.Babel && typeof window.Babel.transformScriptTags === 'function') {
-      window.Babel.transformScriptTags();
+
+    function search() {
+      const type = filterType.value;
+      const sector = filterSector.value;
+      const region = filterRegion.value;
+      const amount = parseInt(filterAmount.value) || 0;
+
+      resultsDiv.innerHTML = `
+        <div class="loading">
+          <div class="spinner"></div>
+          <p>Buscando subvenciones...</p>
+        </div>
+      `;
+
+      // Simular búsqueda con pequeño delay
+      setTimeout(() => {
+        const filtered = grants.filter(grant => {
+          return (
+            (!type || grant.type === type) &&
+            (!sector || grant.sector === sector) &&
+            (!region || grant.region === region) &&
+            grant.amount >= amount
+          );
+        });
+
+        renderResults(filtered);
+      }, 600);
     }
-  } catch (err) {
-    setStatus('Error unpacking: ' + err.message);
-    console.error('Bundle unpack error:', err);
-  }
-});
 
-  </script>
+    function reset() {
+      filterType.value = '';
+      filterSector.value = '';
+      filterRegion.value = '';
+      filterAmount.value = '';
+      resultsDiv.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">📋</div>
+          <p>Usa los filtros y haz clic en "Buscar subvenciones" para empezar</p>
+        </div>
+      `;
+    }
 
-  <script type="__bundler/manifest">
-{"f1e9497c-e787-441b-bd99-8d7ec2442c01":{"mime":"text/javascript","compressed":true,"data":"H4sIAAAAAAAACuy9eXvbRpYv/L8/RcW3Y5I2BcXO9CxSKxlFlrs18XYlOZm+bl+pSBRJRCDARoGS2Ym/+33OUisKlOw4PT3vO36e7ohAodZT[...]
-  </script>
+    searchBtn.addEventListener('click', search);
+    resetBtn.addEventListener('click', reset);
 
-  <script type="__bundler/template">
-  </script>
-
-  <script type="__bundler/ext_resources">
-[]
+    // Buscar al presionar Enter en los inputs
+    document.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') search();
+    });
   </script>
 </body>
 </html>
