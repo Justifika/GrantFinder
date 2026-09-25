@@ -39,6 +39,19 @@ Resultado: Encontrará todas las subvenciones que cumplan con estos criterios
 - **CSS3**: Diseño responsivo con gradientes y animaciones
 - **JavaScript**: Lógica de filtrado sin dependencias externas
 
+## 🧾 OCR de facturas → Excel
+
+Herramienta incluida en [`facturas/`](facturas/) y publicada en `https://justifika.github.io/GrantFinder/facturas/`.
+
+1. Elige el motor de extracción:
+   - **Local (Tesseract OCR)**: gratis y privado, todo se procesa en el navegador. Los PDF con texto se leen directamente; los escaneados y las imágenes pasan por OCR. Extrae cabecera y totales con reglas (NIF/CIF validados, fechas, base, IVA, IRPF, total, IBAN).
+   - **Claude (IA)**: más preciso y con líneas de detalle. Requiere una API key de Anthropic (se usa desde el navegador contra `api.anthropic.com`).
+2. Arrastra las facturas (PDF, JPG, PNG o WEBP; varias a la vez) y pulsa **Extraer datos**.
+3. Revisa y corrige cualquier celda en la tabla (las filas con avisos, p. ej. totales que no cuadran, merecen revisión).
+4. Pulsa **Descargar Excel**: genera un `.xlsx` con la hoja *Facturas* (con fila de totales) y, en modo Claude, la hoja *Líneas*.
+
+Pruebas del extractor: `node facturas/parser.test.mjs`
+
 ## 🌐 Publicación en GitHub Pages
 
 El sitio está publicado automáticamente en: `https://justifika.github.io/GrantFinder/`

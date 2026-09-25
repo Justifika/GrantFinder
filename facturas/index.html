@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>OCR de Facturas a Excel</title>
+  <style>
+    :root {
+      --bg: #f5f6fa; --panel: #fff; --texto: #1f2430; --suave: #5d6475; --borde: #dfe2ea;
+      --primario: #667eea; --primario2: #764ba2; --ok: #1f9d55; --error: #d64545; --aviso: #fff6db;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #14161c; --panel: #1d2029; --texto: #e8eaf0; --suave: #9aa1b2; --borde: #2f3340;
+        --ok: #4cc38a; --error: #ff7a7a; --aviso: #3a3420;
+      }
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--texto); }
+    header { background: linear-gradient(135deg, var(--primario), var(--primario2)); color: #fff; padding: 28px 16px; }
+    header .contenido { max-width: 1200px; margin: 0 auto; }
+    header h1 { margin: 0 0 6px; font-size: 1.7rem; }
+    header p { margin: 0; opacity: .9; }
+    header a { color: #fff; }
+    main { max-width: 1200px; margin: 0 auto; padding: 20px 16px 60px; display: grid; gap: 20px; }
+    main > * { min-width: 0; }
+    .panel { background: var(--panel); border: 1px solid var(--borde); border-radius: 12px; padding: 20px; }
+    .panel h2 { margin: 0 0 14px; font-size: 1.1rem; }
+    .motores { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+    .motor { display: flex; gap: 10px; align-items: flex-start; border: 2px solid var(--borde); border-radius: 10px; padding: 12px; cursor: pointer; }
+    .motor:has(input:checked) { border-color: var(--primario); }
+    .motor strong { display: block; }
+    .motor small { color: var(--suave); }
+    #opcionesClaude { margin-top: 14px; display: grid; grid-template-columns: 1fr auto; gap: 10px 14px; align-items: end; }
+    #opcionesClaude[hidden] { display: none; }
+    @media (max-width: 600px) { #opcionesClaude { grid-template-columns: 1fr; } .panel { padding: 16px; } }
+    label.campo { display: grid; gap: 4px; font-size: .9rem; color: var(--suave); }
+    input[type=password], select { font: inherit; padding: 9px 10px; border-radius: 8px; border: 1px solid var(--borde); background: var(--bg); color: var(--texto); width: 100%; }
+    .nota { grid-column: 1 / -1; font-size: .82rem; color: var(--suave); margin: 0; }
+    #zona { border: 2px dashed var(--borde); border-radius: 12px; padding: 36px 16px; text-align: center; cursor: pointer; color: var(--suave); transition: .15s; }
+    #zona:hover, #zona.encima, #zona:focus-visible { border-color: var(--primario); background: color-mix(in srgb, var(--primario) 8%, transparent); outline: none; }
+    #zona .grande { font-size: 2rem; display: block; }
+    #listaArchivos { list-style: none; padding: 0; margin: 14px 0 0; display: grid; gap: 6px; }
+    .archivo { display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: center; padding: 8px 10px; border: 1px solid var(--borde); border-radius: 8px; font-size: .92rem; }
+    .archivo .nombre { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .archivo .msg { color: var(--suave); font-size: .85rem; }
+    .archivo.ok .msg { color: var(--ok); }
+    .archivo.error .msg { color: var(--error); }
+    .archivo.procesando .msg::before { content: "⏳ "; }
+    .acciones { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 14px; align-items: center; }
+    button { font: inherit; cursor: pointer; }
+    .btn { padding: 10px 18px; border-radius: 8px; border: 0; font-weight: 600; }
+    .btn.primario { background: linear-gradient(135deg, var(--primario), var(--primario2)); color: #fff; }
+    .btn.secundario { background: transparent; color: var(--texto); border: 1px solid var(--borde); }
+    .btn:disabled { opacity: .45; cursor: not-allowed; }
+    .quitar { background: none; border: 0; color: var(--suave); font-size: 1.2rem; line-height: 1; padding: 2px 6px; border-radius: 6px; }
+    .quitar:hover:not(:disabled) { color: var(--error); background: color-mix(in srgb, var(--error) 12%, transparent); }
+    #aviso { background: var(--aviso); border-radius: 8px; padding: 10px 12px; margin: 12px 0 0; font-size: .9rem; }
+    #aviso[hidden] { display: none; }
+    .cabecera-resultados { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 12px; }
+    .cabecera-resultados h2 { margin: 0; }
+    #resumen { color: var(--suave); font-size: .9rem; }
+    .scroll { overflow-x: auto; border: 1px solid var(--borde); border-radius: 8px; }
+    table { border-collapse: collapse; width: max-content; min-width: 100%; font-size: .88rem; }
+    th, td { padding: 7px 10px; border-bottom: 1px solid var(--borde); text-align: left; white-space: nowrap; max-width: 320px; overflow: hidden; text-overflow: ellipsis; }
+    th { background: var(--bg); position: sticky; top: 0; font-weight: 600; }
+    td[contenteditable]:hover { background: color-mix(in srgb, var(--primario) 6%, transparent); }
+    td[contenteditable]:focus { outline: 2px solid var(--primario); outline-offset: -2px; white-space: normal; }
+    .num { text-align: right; font-variant-numeric: tabular-nums; }
+    tr.con-aviso td:nth-last-child(2) { color: var(--error); }
+    #bloqueLineas { margin-top: 20px; }
+    #bloqueLineas h3 { font-size: 1rem; margin: 0 0 10px; }
+    [hidden] { display: none !important; }
+    .ayuda { font-size: .82rem; color: var(--suave); margin: 10px 0 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="contenido">
+      <h1>🧾 OCR de facturas → Excel</h1>
+      <p>Sube facturas en PDF o imagen, revisa los datos extraídos y descárgalos en un .xlsx. <a href="../">← Volver a GrantFinder</a></p>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <h2>1. Motor de extracción</h2>
+      <div class="motores">
+        <label class="motor">
+          <input type="radio" name="motor" value="local" checked>
+          <span><strong>Local (Tesseract OCR)</strong><small>Gratis y privado: las facturas no salen de tu navegador. Extrae cabecera y totales con reglas; conviene revisar el resultado.</small></span>
+        </label>
+        <label class="motor">
+          <input type="radio" name="motor" value="claude">
+          <span><strong>Claude (IA)</strong><small>Mucho más preciso, entiende cualquier formato y extrae también las líneas de detalle. Necesita tu API key de Anthropic (se cobra por uso).</small></span>
+        </label>
+      </div>
+      <div id="opcionesClaude" hidden>
+        <label class="campo">API key de Anthropic
+          <input type="password" id="apiKey" placeholder="sk-ant-..." autocomplete="off" spellcheck="false">
+        </label>
+        <label class="campo">Modelo
+          <select id="modelo">
+            <option value="claude-opus-5">Claude Opus 5 (máxima precisión)</option>
+            <option value="claude-sonnet-5">Claude Sonnet 5 (más económico)</option>
+          </select>
+        </label>
+        <label class="nota"><input type="checkbox" id="recordar"> Recordar la API key en este navegador</label>
+        <p class="nota">La clave se envía solo a api.anthropic.com desde tu navegador. Úsala en un equipo de confianza y, si puedes, crea una clave específica con límite de gasto.</p>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>2. Facturas</h2>
+      <div id="zona" tabindex="0" role="button" aria-label="Seleccionar facturas">
+        <span class="grande">📄</span>
+        Arrastra aquí tus facturas o haz clic para seleccionarlas<br>
+        <small>PDF, JPG, PNG o WEBP · puedes subir varias a la vez</small>
+      </div>
+      <input type="file" id="input" accept="application/pdf,image/jpeg,image/png,image/webp,image/gif" multiple hidden>
+      <ul id="listaArchivos"></ul>
+      <p id="aviso" hidden></p>
+      <div class="acciones">
+        <button class="btn primario" id="procesar" disabled>Extraer datos</button>
+      </div>
+    </section>
+
+    <section class="panel" id="resultados" hidden>
+      <div class="cabecera-resultados">
+        <div>
+          <h2>3. Revisa y exporta</h2>
+          <span id="resumen"></span>
+        </div>
+        <div class="acciones" style="margin:0">
+          <button class="btn secundario" id="limpiar">Vaciar</button>
+          <button class="btn primario" id="exportar" disabled>⬇ Descargar Excel</button>
+        </div>
+      </div>
+      <div class="scroll"><table id="tablaFacturas"></table></div>
+      <p class="ayuda">Haz clic en cualquier celda para corregirla antes de exportar. Las filas con avisos (p. ej. totales que no cuadran) merecen una revisión.</p>
+      <div id="bloqueLineas" hidden>
+        <h3>Líneas de detalle</h3>
+        <div class="scroll"><table id="tablaLineas"></table></div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
