@@ -1,54 +1,39 @@
 # GrantFinder
 
-## 🎯 Descripción
+Buscador de subvenciones públicas en España para PYMEs y autónomos.
 
-GrantFinder es una aplicación web moderna que te ayuda a encontrar subvenciones públicas en España adaptadas a tu perfil. Con filtros intuitivos y una interfaz visual atractiva, puedes buscar oportunidades de financiación de forma rápida y eficiente.
+> **Estado:** prototipo. Los datos que muestra son de ejemplo (ficticios), no convocatorias reales.
 
-## ✨ Características
-
-- **Filtros avanzados**: Busca por tipo de solicitante, sector, región e importe mínimo
-- **Interfaz moderna**: Diseño responsivo con gradientes y efectos visuales
-- **Base de datos de subvenciones**: Acceso a múltiples oportunidades de financiación
-- **Búsqueda instantánea**: Resultados en tiempo real según tus criterios
-- **100% funcional**: Completamente desarrollado en HTML, CSS y JavaScript vanilla
-
-## 🚀 Cómo usar
-
-1. Ve a [GrantFinder en tu navegador](https://justifika.github.io/GrantFinder/)
-2. Utiliza los filtros en el panel izquierdo para especificar tus criterios
-3. Haz clic en "🔍 Buscar subvenciones" o presiona Enter
-4. Explora los resultados y revisa los detalles de cada subvención
-
-## 🔍 Filtros disponibles
-
-- **Tipo de solicitante**: PYME, Startup, Autónomo, Empresa, ONG
-- **Sector**: Tecnología, Energía, Agricultura, Turismo, Cultura
-- **Región**: Madrid, Barcelona, Valencia, Bilbao, Sevilla
-- **Importe mínimo**: Filtra por cantidad mínima en euros
-
-## 📊 Ejemplo de uso
+## Estructura del proyecto
 
 ```
-Buscas: Startup + Tecnología + Barcelona + 80,000€
-Resultado: Encontrará todas las subvenciones que cumplan con estos criterios
+GrantFinder/
+├── index.html          → Página principal (solo estructura HTML)
+├── css/
+│   └── estilos.css     → Diseño y colores
+├── js/
+│   ├── datos.js        → Listado de subvenciones (ahora, de ejemplo)
+│   └── app.js          → Lógica de filtros y búsqueda
+├── archivo/
+│   └── index-antiguo.html  → Versión anterior, pendiente de revisar o borrar
+├── .gitignore          → Archivos que Git debe ignorar
+└── README.md           → Este documento
 ```
 
-## 🛠️ Tecnología
+## Cómo verlo en tu ordenador
 
-- **HTML5**: Estructura semántica moderna
-- **CSS3**: Diseño responsivo con gradientes y animaciones
-- **JavaScript**: Lógica de filtrado sin dependencias externas
+1. Descarga el repositorio (botón verde **Code → Download ZIP**).
+2. Descomprímelo y abre `index.html` con doble clic.
 
-## 🌐 Publicación en GitHub Pages
+No necesita instalar nada: es HTML, CSS y JavaScript sin dependencias.
 
-El sitio está publicado automáticamente en: `https://justifika.github.io/GrantFinder/`
+## Funcionalidad actual
 
-## 📝 Notas
+- Filtros por tipo de solicitante, sector, región e importe mínimo.
+- Resultados con importe y fecha de cierre.
 
-- Los datos mostrados son de ejemplo para demostración
-- La aplicación es completamente funcional y responsiva
-- Compatible con navegadores modernos (Chrome, Firefox, Safari, Edge)
+## Próximos pasos
 
----
-
-**Desarrollado con ❤️ por Justifika**
+- [ ] Sustituir `js/datos.js` por datos reales (p. ej., BDNS).
+- [ ] Decidir qué hacer con `archivo/index-antiguo.html`.
+- [ ] Elegir hosting para publicar la web (el repo es privado).
