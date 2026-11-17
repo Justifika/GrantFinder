@@ -1,0 +1,16 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+.vscode/
+.idea/
+
+# Dependencias y compilados (por si se usan en el futuro)
+node_modules/
+dist/
+
+# Claves y configuración privada: NUNCA subir
+.env
+.env.*
